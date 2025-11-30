@@ -38,4 +38,11 @@ public class Dice : MonoBehaviour
         StartCoroutine(RollRoutine());
     }
 
+    public void RollDice()
+    {
+        if (!isRolling && diceSides != null && diceSides.Length > 0)
+            StartCoroutine(RollRoutine());
+    }
+
+
 }
