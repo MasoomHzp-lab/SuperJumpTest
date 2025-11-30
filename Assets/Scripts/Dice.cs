@@ -24,4 +24,11 @@ public class Dice : MonoBehaviour
 
     public PlayerController currentPlayer;
 
+    void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
+
+    }
+
+
 }
