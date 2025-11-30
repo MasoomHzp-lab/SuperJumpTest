@@ -30,5 +30,12 @@ public class Dice : MonoBehaviour
 
     }
 
+    public void Roll()
+    {
+        if (isRolling) return;
+        if (GameManager.I != null && !GameManager.I.CanRoll()) return;
+
+        StartCoroutine(RollRoutine());
+    }
 
 }
