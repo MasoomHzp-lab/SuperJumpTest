@@ -24,12 +24,12 @@ public class Dice : MonoBehaviour
 
     public PlayerController currentPlayer;
 
+
     void Awake()
     {
         audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
 
     }
-
     public void Roll()
     {
         if (isRolling) return;
@@ -37,12 +37,12 @@ public class Dice : MonoBehaviour
 
         StartCoroutine(RollRoutine());
     }
-
     public void RollDice()
     {
         if (!isRolling && diceSides != null && diceSides.Length > 0)
             StartCoroutine(RollRoutine());
     }
+
 
     private IEnumerator RollRoutine()
     {
@@ -97,6 +97,9 @@ public class Dice : MonoBehaviour
     }
 
 
-
+    public void PlayDiceSound()
+    {
+        AudioManager.Instance.PlaySFX(diceRollingSound);
+    }
 
 }
