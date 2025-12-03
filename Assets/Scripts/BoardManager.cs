@@ -127,5 +127,4 @@ public class BoardManager : MonoBehaviour
             Debug.LogWarning($"[BoardManager] Home path for {name} is empty (can be temporary).");
     }
 
-
 }
