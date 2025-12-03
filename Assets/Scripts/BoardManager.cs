@@ -36,4 +36,72 @@ public class BoardManager : MonoBehaviour
     public int yellowHomeEntryOffset = -1;
     public int greenHomeEntryOffset = -1;
 
+    public List<Transform> GetFullPath(PlayerColor color)
+    {
+        var path = new List<Transform>();
+
+        if (commonPath == null || commonPath.Count == 0)
+        {
+            Debug.LogError("[BoardManager] commonPath is empty!");
+            return path;
+        }
+
+        int startIndex = GetStartIndex(color);
+        int entryOffset = GetHomeEntryOffset(color);
+        int entryIndex = Mod(startIndex + entryOffset, commonPath.Count);
+
+        // Add loop path from start to home entry
+        int i = startIndex;
+        path.Add(commonPath[i]);
+        while (i != entryIndex)
+        {
+            i = (i + 1) % commonPath.Count;
+            path.Add(commonPath[i]);
+            if (path.Count > commonPath.Count + 2)
+            {
+                Debug.LogError("[BoardManager] Infinite loop detected while building path!");
+                break;
+            }
+        }
+
+        // Add home path for that color
+        path.AddRange(GetHomeList(color));
+
+        return path;
+    }
+
+    public Vector3 GetTilePosition(PlayerColor color, int index)
+    {
+        var full = GetFullPath(color);
+        if (full == null || full.Count == 0) return Vector3.zero;
+
+        if (index < 0)
+        {
+            Debug.LogWarning($"[BoardManager] index < 0 for {color}, clamped to 0.");
+            index = 0;
+        }
+        else if (index >= full.Count)
+        {
+            Debug.LogWarning($"[BoardManager] index {index} out of range for {color}, clamped to end.");
+            index = full.Count - 1;
+        }
+
+        if (full[index] == null)
+        {
+            Debug.LogError($"[BoardManager] Null Transform in {color} path at index {index}.");
+            return Vector3.zero;
+        }
+
+        return full[index].position;
+    }
+
+    private int GetStartIndex(PlayerColor color) => color switch
+    {
+        PlayerColor.Red => ClampIndex(redStartIndex),
+        PlayerColor.Blue => ClampIndex(blueStartIndex),
+        PlayerColor.Yellow => ClampIndex(yellowStartIndex),
+        PlayerColor.Green => ClampIndex(greenStartIndex),
+        _ => 0
+    };
+
 }
