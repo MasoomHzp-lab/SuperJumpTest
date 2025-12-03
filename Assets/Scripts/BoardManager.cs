@@ -164,4 +164,5 @@ public class BoardManager : MonoBehaviour
         DebugPathForColor(PlayerColor.Green);
     }
 
+
 }
