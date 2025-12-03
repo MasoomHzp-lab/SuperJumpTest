@@ -104,4 +104,28 @@ public class BoardManager : MonoBehaviour
         _ => 0
     };
 
+    private static int Mod(int a, int m)
+    {
+        int r = a % m;
+        return r < 0 ? r + m : r;
+    }
+
+    private void OnValidate()
+    {
+        if (commonPath.Count == 0)
+            Debug.LogWarning("[BoardManager] commonPath is empty. Please assign tiles.");
+
+        CheckHome("Red", redHome);
+        CheckHome("Blue", blueHome);
+        CheckHome("Yellow", yellowHome);
+        CheckHome("Green", greenHome);
+    }
+
+    private void CheckHome(string name, List<Transform> list)
+    {
+        if (list == null || list.Count == 0)
+            Debug.LogWarning($"[BoardManager] Home path for {name} is empty (can be temporary).");
+    }
+
+
 }
