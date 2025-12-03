@@ -104,4 +104,34 @@ public class BoardManager : MonoBehaviour
         _ => 0
     };
 
+    private int GetHomeEntryOffset(PlayerColor color) => color switch
+    {
+        PlayerColor.Red => redHomeEntryOffset,
+        PlayerColor.Blue => blueHomeEntryOffset,
+        PlayerColor.Yellow => yellowHomeEntryOffset,
+        PlayerColor.Green => greenHomeEntryOffset,
+        _ => -1
+    };
+
+    private List<Transform> GetHomeList(PlayerColor color) => color switch
+    {
+        PlayerColor.Red => redHome,
+        PlayerColor.Blue => blueHome,
+        PlayerColor.Yellow => yellowHome,
+        PlayerColor.Green => greenHome,
+        _ => redHome
+    };
+
+    private int ClampIndex(int idx)
+    {
+        if (commonPath == null || commonPath.Count == 0) return 0;
+        if (idx < 0 || idx >= commonPath.Count)
+        {
+            Debug.LogWarning($"[BoardManager] startIndex {idx} is out of range, clamped.");
+            idx = Mod(idx, commonPath.Count);
+        }
+        return idx;
+    }
+
+
 }
