@@ -395,7 +395,7 @@ public class GameManager : MonoBehaviour
                 if (other == null) continue;
                 if (!other.isOnBoard) continue;
                 if (other == token) continue;
-
+                
                 int idx = other.currentTileIndex;
 
                 // فقط مهره‌هایی که داخل راهروی آخر هستن و جلوتر از این مهره‌ان
@@ -405,7 +405,6 @@ public class GameManager : MonoBehaviour
                         nearestBlocker = idx;
                 }
             }
-
             // اگه بلاکری هست: حداکثر تا خونه‌ی قبلش می‌تونی بری
             if (nearestBlocker != int.MaxValue)
             {
@@ -419,9 +418,6 @@ public class GameManager : MonoBehaviour
     // بیرون از راهروی آخر → مثل قبل، استک هم‌رنگ آزاده
     return true;
 }
-
-
-
     public void OnTurnTimeout()
     {
         // اگر هنوز اجازه‌ی تاس دادن داشته و کاری نکرده، نوبتش می‌سوزه
@@ -436,6 +432,4 @@ public class GameManager : MonoBehaviour
             Debug.Log("[GM] Timeout ignored (already rolled).");
         }
     }
-
-
 }
