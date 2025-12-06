@@ -380,7 +380,6 @@ public class GameManager : MonoBehaviour
         case PlayerColor.Yellow: homeCount = bm.yellowHome != null ? bm.yellowHome.Count : 0; break;
         case PlayerColor.Green:  homeCount = bm.greenHome  != null ? bm.greenHome.Count  : 0; break;
     }
-
     if (homeCount > 0)
     {
         int homeStartIndex = path.Count - homeCount;
@@ -388,3 +387,55 @@ public class GameManager : MonoBehaviour
         // فقط وقتی مهمه که حرکت قراره وارد این بخش آخر بشه یا داخلش ادامه پیدا کنه
         if (targetIndex >= homeStartIndex)
         {
+               // نزدیک‌ترین مهره‌ی خودت که جلوتر از این مهره تو راهروی آخر وایساده
+            int nearestBlocker = int.MaxValue;
+
+            foreach (var other in player.Tokens)
+            {
+                if (other == null) continue;
+                if (!other.isOnBoard) continue;
+                if (other == token) continue;
+
+                int idx = other.currentTileIndex;
+
+                // فقط مهره‌هایی که داخل راهروی آخر هستن و جلوتر از این مهره‌ان
+                if (idx >= homeStartIndex && idx > currentIndex)
+                {
+                    if (idx < nearestBlocker)
+                        nearestBlocker = idx;
+                }
+            }
+
+            // اگه بلاکری هست: حداکثر تا خونه‌ی قبلش می‌تونی بری
+            if (nearestBlocker != int.MaxValue)
+            {
+                int maxAllowed = nearestBlocker - 1;
+                if (targetIndex > maxAllowed)
+                    return false;
+            }
+        }
+    }
+
+    // بیرون از راهروی آخر → مثل قبل، استک هم‌رنگ آزاده
+    return true;
+}
+
+
+
+    public void OnTurnTimeout()
+    {
+        // اگر هنوز اجازه‌ی تاس دادن داشته و کاری نکرده، نوبتش می‌سوزه
+        if (canRoll)
+        {
+            Debug.Log("[GM] Turn timeout → passing turn.");
+            StartCoroutine(PassTurnImmediately());
+        }
+        else
+        {
+            // اگر از قبل رول کرده بوده و تایمر هنوز روشن مونده، بی‌اثر.
+            Debug.Log("[GM] Timeout ignored (already rolled).");
+        }
+    }
+
+
+}
