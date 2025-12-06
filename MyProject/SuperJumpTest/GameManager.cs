@@ -310,4 +310,81 @@ public class GameManager : MonoBehaviour
         canRoll = true;
     }
 
+    // ====== بررسی‌های قانونی ساده ======
+    bool HasLegalMove(PlayerController player, int steps)
+{
+    if (player == null) return false;
+    if (player.Tokens == null || player.Tokens.Count == 0) return false;
 
+    // اگر ورود فقط با ۶ است و ۶ نیامده، حداقل باید یک توکن روی بورد باشد
+    if (enterOnlyOnSix && steps != 6)
+    {
+        bool anyOnBoard = false;
+        foreach (var t in player.Tokens)
+            if (t != null && t.isOnBoard) { anyOnBoard = true; break; }
+        if (!anyOnBoard) return false;
+    }
+
+    // اگر حتی یک توکن حرکت قانونی داشته باشد، true
+    foreach (var t in player.Tokens)
+    {
+        if (t == null) continue;
+
+        // ⬅ این خط جدید: مهره‌های تمام‌شده را نادیده بگیر
+        if (rules != null && rules.IsTokenFinished(t)) 
+            continue;
+
+        if (IsLegalMove(player, t, steps))
+            return true;
+    }
+
+    return false;
+}
+
+
+    // public تا AI بتواند صدا بزند
+ public bool IsLegalMove(PlayerController player, Token token, int steps)
+{
+    if (player == null || token == null) return false;
+    if (steps <= 0 || token.isMoving) return false;
+
+    // مهره‌ای که فینیش شده، دیگه نباید حرکت کنه
+    if (rules != null && rules.IsTokenFinished(token))
+        return false;
+
+    var bm = player.boardManager;
+    if (bm == null) return false;
+
+    var path = bm.GetFullPath(player.color);
+    if (path == null || path.Count == 0) return false;
+
+    int lastIndex = path.Count - 1;
+
+    // اگر هنوز روی برد نیست → فقط با ۶ اجازه‌ی ورود
+    if (!token.isOnBoard)
+        return (enterOnlyOnSix && steps == 6);
+
+    int currentIndex = token.currentTileIndex;
+    int targetIndex  = currentIndex + steps;
+
+    // ۱) اصلاً نباید از آخر مسیر رد بشه
+    if (targetIndex > lastIndex)
+        return false;
+
+    // ۲) منطق راهروی آخر (خونه‌های رنگی تا مرکز / خونه‌های آخر)
+    int homeCount = 0;
+    switch (player.color)
+    {
+        case PlayerColor.Red:    homeCount = bm.redHome    != null ? bm.redHome.Count    : 0; break;
+        case PlayerColor.Blue:   homeCount = bm.blueHome   != null ? bm.blueHome.Count   : 0; break;
+        case PlayerColor.Yellow: homeCount = bm.yellowHome != null ? bm.yellowHome.Count : 0; break;
+        case PlayerColor.Green:  homeCount = bm.greenHome  != null ? bm.greenHome.Count  : 0; break;
+    }
+
+    if (homeCount > 0)
+    {
+        int homeStartIndex = path.Count - homeCount;
+
+        // فقط وقتی مهمه که حرکت قراره وارد این بخش آخر بشه یا داخلش ادامه پیدا کنه
+        if (targetIndex >= homeStartIndex)
+        {
