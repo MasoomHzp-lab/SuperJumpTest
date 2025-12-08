@@ -57,5 +57,24 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    public List<Token> GetTokens() => tokens;
+
+    public bool IsMoving()
+    {
+        foreach (var t in tokens) if (t.isMoving) return true;
+        return false;
+    }
+
+    public bool MoveToken(Token token, int steps)
+    {
+        if (token == null || token.isMoving) return false;
+        if (!tokens.Contains(token)) return false; // فقط مهره‌های خودش
+        token.MoveSteps(steps);
+        // PlayTokenSound();
+        return true;
+
+    }
+
+
 
 }
