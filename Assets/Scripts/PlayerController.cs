@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+
     public List<Token> GetTokens() => tokens;
 
     public bool IsMoving()
@@ -75,6 +76,20 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public bool HasAllTokensFinished()
+    {
+        var pathLen = boardManager.GetFullPath(color).Count;
+        foreach (var t in tokens)
+            if (t.currentTileIndex < pathLen - 1) return false;
+
+        return true;
+    }
+
+    public void PlayTokenSound()
+    {
+
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.TokenSound);
 
 
+    }
 }
