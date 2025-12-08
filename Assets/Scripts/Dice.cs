@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class Dice : MonoBehaviour
 {
-    AudioManager audioManager;
     public AudioClip diceRollingSound;
 
     [Header("Dice Settings")]
