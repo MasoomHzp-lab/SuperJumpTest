@@ -167,6 +167,62 @@ public void HandleIfFinished(Token t)
         return bestIdx;
     }
 
+// ======================================
+    // Home / Spawn helpers
+    // ======================================
+
+    private void EnsureHomeSlotAssigned(Token t)
+    {
+        if (t == null || t.owner == null) return;
+        if (homeSlotOfToken.ContainsKey(t)) return;
+
+        var pc = t.owner;
+        if (pc.spawnPoints == null || pc.spawnPoints.Count == 0) return;
+
+        int idx = NearestSpawnIndex(pc, t.transform.position);
+        if (idx < 0) idx = 0;
+        homeSlotOfToken[t] = idx;
+    }
+
+    private int FindHomeSlotFor(Token t)
+    {
+        var pc = t.owner;
+        if (pc == null || pc.spawnPoints == null || pc.spawnPoints.Count == 0) return 0;
+        int count = pc.spawnPoints.Count;
+
+        bool[] occupied = new bool[count];
+        foreach (var tok in pc.Tokens)
+        {
+            if (tok == null || tok == t) continue;
+            if (tok.isOnBoard) continue;
+
+            if (homeSlotOfToken.TryGetValue(tok, out int hs) && hs >= 0 && hs < count)
+            {
+                occupied[hs] = true;
+            }
+            else
+            {
+                int nearest = NearestSpawnIndex(pc, tok.transform.position);
+                if (nearest >= 0 && nearest < count) occupied[nearest] = true;
+            }
+        }
+
+        if (homeSlotOfToken.TryGetValue(t, out int mySlot) &&
+            mySlot >= 0 && mySlot < count && !occupied[mySlot])
+            return mySlot;
+
+        int bestIdx = -1;
+        float best = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            if (pc.spawnPoints[i] == null || occupied[i]) continue;
+            float d = (pc.spawnPoints[i].position - t.transform.position).sqrMagnitude;
+            if (d < best) { best = d; bestIdx = i; }
+        }
+        return (bestIdx >= 0) ? bestIdx : 0;
+    }
+
+
 }
 
 
