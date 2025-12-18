@@ -165,4 +165,58 @@ public class BoardManager : MonoBehaviour
     }
 
 
+    private int GetHomeEntryOffset(PlayerColor color) => color switch
+    {
+        PlayerColor.Red => redHomeEntryOffset,
+        PlayerColor.Blue => blueHomeEntryOffset,
+        PlayerColor.Yellow => yellowHomeEntryOffset,
+        PlayerColor.Green => greenHomeEntryOffset,
+        _ => -1
+    };
+
+    private List<Transform> GetHomeList(PlayerColor color) => color switch
+    {
+        PlayerColor.Red => redHome,
+        PlayerColor.Blue => blueHome,
+        PlayerColor.Yellow => yellowHome,
+        PlayerColor.Green => greenHome,
+        _ => redHome
+    };
+
+    private int ClampIndex(int idx)
+    {
+        if (commonPath == null || commonPath.Count == 0) return 0;
+        if (idx < 0 || idx >= commonPath.Count)
+        {
+            Debug.LogWarning($"[BoardManager] startIndex {idx} is out of range, clamped.");
+            idx = Mod(idx, commonPath.Count);
+        }
+        return idx;
+    }
+
+
+    private static int Mod(int a, int m)
+    {
+        int r = a % m;
+        return r < 0 ? r + m : r;
+    }
+
+    private void OnValidate()
+    {
+        if (commonPath.Count == 0)
+            Debug.LogWarning("[BoardManager] commonPath is empty. Please assign tiles.");
+
+        CheckHome("Red", redHome);
+        CheckHome("Blue", blueHome);
+        CheckHome("Yellow", yellowHome);
+        CheckHome("Green", greenHome);
+    }
+
+    private void CheckHome(string name, List<Transform> list)
+    {
+        if (list == null || list.Count == 0)
+            Debug.LogWarning($"[BoardManager] Home path for {name} is empty (can be temporary).");
+    }
+
+
 }
