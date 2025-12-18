@@ -104,36 +104,6 @@ public class BoardManager : MonoBehaviour
         _ => 0
     };
 
-    private int GetHomeEntryOffset(PlayerColor color) => color switch
-    {
-        PlayerColor.Red => redHomeEntryOffset,
-        PlayerColor.Blue => blueHomeEntryOffset,
-        PlayerColor.Yellow => yellowHomeEntryOffset,
-        PlayerColor.Green => greenHomeEntryOffset,
-        _ => -1
-    };
-
-    private List<Transform> GetHomeList(PlayerColor color) => color switch
-    {
-        PlayerColor.Red => redHome,
-        PlayerColor.Blue => blueHome,
-        PlayerColor.Yellow => yellowHome,
-        PlayerColor.Green => greenHome,
-        _ => redHome
-    };
-
-    private int ClampIndex(int idx)
-    {
-        if (commonPath == null || commonPath.Count == 0) return 0;
-        if (idx < 0 || idx >= commonPath.Count)
-        {
-            Debug.LogWarning($"[BoardManager] startIndex {idx} is out of range, clamped.");
-            idx = Mod(idx, commonPath.Count);
-        }
-        return idx;
-    }
-
-
     private static int Mod(int a, int m)
     {
         int r = a % m;
@@ -155,6 +125,43 @@ public class BoardManager : MonoBehaviour
     {
         if (list == null || list.Count == 0)
             Debug.LogWarning($"[BoardManager] Home path for {name} is empty (can be temporary).");
+    }
+
+    public int GetLoopLength(PlayerColor color)
+    {
+        if (commonPath == null || commonPath.Count == 0) return 0;
+
+        int start = GetStartIndex(color);
+        int entryOffset = GetHomeEntryOffset(color);
+        int entry = Mod(start + entryOffset, commonPath.Count);
+
+        int dist = (entry - start);
+        if (dist < 0) dist += commonPath.Count;
+        return dist + 1; // شامل start و entry
+    }
+
+    public bool TryGetRingId(PlayerColor color, int currentTileIndex, out int ringId)
+    {
+        ringId = -1;
+        if (commonPath == null || commonPath.Count == 0) return false;
+        if (currentTileIndex < 0) return false;
+
+        int loopLen = GetLoopLength(color);
+        if (currentTileIndex >= loopLen) return false; // وارد منزل شده
+
+        int start = GetStartIndex(color);
+        ringId = Mod(start + currentTileIndex, commonPath.Count);
+        return true;
+    }
+
+    // فقط برای دیباگ مسیرها
+    [ContextMenu("Debug Ludo Paths")]
+    public void DebugLudoPaths()
+    {
+        DebugPathForColor(PlayerColor.Blue);
+        DebugPathForColor(PlayerColor.Red);
+        DebugPathForColor(PlayerColor.Yellow);
+        DebugPathForColor(PlayerColor.Green);
     }
 
 
