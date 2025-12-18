@@ -113,7 +113,31 @@ public void HandleIfFinished(Token t)
     }
 }
 
+  /// به صورت دستی برگرداندن مهره به خانه (اگر جای دیگری لازم داشته باشی)
+    public void SendTokenHome(Token t)
+    {
+        if (t == null || t.owner == null) return;
 
+        finishedTokens.Remove(t);
+        t.isOnBoard = false;
+        t.isMoving = false;
+        t.currentTileIndex = -1;
+
+        int slot = FindHomeSlotFor(t);
+        homeSlotOfToken[t] = slot;
+
+        var pc = t.owner;
+        if (pc != null && pc.spawnPoints != null && pc.spawnPoints.Count > 0)
+        {
+            int idx = Mathf.Clamp(slot, 0, pc.spawnPoints.Count - 1);
+            var sp = pc.spawnPoints[idx];
+            if (sp != null) t.transform.position = sp.position;
+        }
+
+        Debug.Log($"[SendHome] {t.name} -> {t.owner.color} spawn slot {slot}");
+    }
+
+    
 
 }
 
