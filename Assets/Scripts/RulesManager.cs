@@ -222,6 +222,34 @@ public void HandleIfFinished(Token t)
         return (bestIdx >= 0) ? bestIdx : 0;
     }
 
+ private int NearestSpawnIndex(PlayerController pc, Vector3 pos)
+    {
+        if (pc == null || pc.spawnPoints == null || pc.spawnPoints.Count == 0) return -1;
+        float best = float.MaxValue;
+        int bestIdx = -1;
+        for (int i = 0; i < pc.spawnPoints.Count; i++)
+        {
+            var sp = pc.spawnPoints[i];
+            if (sp == null) continue;
+            float d = (pos - sp.position).sqrMagnitude;
+            if (d < best) { best = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
+
+    public void ResetFinishState()
+{
+    finishedTokens.Clear();
+    finishCounters.Clear();
+    // اگه جایی لازم شد خونه‌ها رو هم ریست کنی:
+    // homeSlotOfToken.Clear();
+}
+
+public bool IsTokenFinished(Token t)
+{
+    return t != null && finishedTokens.Contains(t);
+}
+
 
 }
 
