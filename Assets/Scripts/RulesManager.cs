@@ -137,7 +137,35 @@ public void HandleIfFinished(Token t)
         Debug.Log($"[SendHome] {t.name} -> {t.owner.color} spawn slot {slot}");
     }
 
-    
+     public bool IsFinished(Token t) => t != null && finishedTokens.Contains(t);
+
+    // ======================================
+    // Finish Bay helpers
+    // ======================================
+
+    private FinishBay GetBay(PlayerColor color)
+    {
+        for (int i = 0; i < finishBays.Count; i++)
+            if (finishBays[i] != null && finishBays[i].color == color)
+                return finishBays[i];
+        return null;
+    }
+
+
+    private int NearestIndex(List<Transform> points, Vector3 pos)
+    {
+        if (points == null || points.Count == 0) return -1;
+        float best = float.MaxValue;
+        int bestIdx = -1;
+        for (int i = 0; i < points.Count; i++)
+        {
+            var p = points[i];
+            if (p == null) continue;
+            float d = (p.position - pos).sqrMagnitude;
+            if (d < best) { best = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
 
 }
 
