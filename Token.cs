@@ -64,3 +64,62 @@ public void SnapToHomeSlot()
 
         gameManager.OnTokenSelected(this);
     }
+     public void MoveSteps(int steps)
+    {
+        if (!gameManager) return;
+        if (!isMoving)
+            gameManager.StartCoroutine(MoveCoroutine(steps)); // از GameManager coroutine اجرا شود
+    }
+
+private IEnumerator MoveCoroutine(int steps)
+{
+    isMoving = true;
+
+    // اگر مهره هنوز وارد زمین نشده، اول ببریمش خانه‌ی شروع مسیر
+    if (!isOnBoard)
+    {
+        currentTileIndex = 0;
+        transform.position = boardManager.GetTilePosition(color, currentTileIndex);
+        isOnBoard = true;
+        steps -= 1;
+    }
+
+    for (int i = 0; i < steps; i++)
+    {
+        currentTileIndex++;
+
+        var path = boardManager.GetFullPath(color);
+        if (path == null || path.Count == 0)
+        {
+            Debug.LogWarning("[Token] Path is null or empty for color " + color);
+            break;
+        }
+
+        if (currentTileIndex >= path.Count)
+        {
+            currentTileIndex = path.Count - 1; // رسید به پایان مسیر
+            break;
+        }
+
+        Vector3 target = boardManager.GetTilePosition(color, currentTileIndex);
+        while (Vector3.Distance(transform.position, target) > 0.01f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * 5f);
+            yield return null;
+        }
+    }
+
+    PlayTokenSound();
+    isMoving = false;
+
+    // ✅ بعد از تمام شدن حرکت، قوانین فینیش شدن را چک کن
+    if (rulesManager != null)
+    {
+        Debug.Log("[Token] Move finished, asking RulesManager to check finish for " + name);
+        rulesManager.HandleIfFinished(this);
+    }
+    else
+    {
+        Debug.LogWarning("[Token] rulesManager در Token ست نشده!");
+    }
+}
