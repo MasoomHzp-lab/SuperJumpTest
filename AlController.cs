@@ -186,3 +186,50 @@ public class AIController : MonoBehaviour
         // ۲) غیر از ۶ → فقط از روی برد انتخاب کن
         return ChooseBest(movable, diceVal);
     }
+private Token ChooseBest(List<Token> movable, int diceVal)
+    {
+        // اولویت‌ها:
+        // A) اگر مهره‌ای روی Start هست (و قانونی) همونو ببر تا گره‌ی Start باز شه
+        var startTok = movable.FirstOrDefault(t => t.currentTileIndex == 0);
+        if (startTok != null) return startTok;
+
+        // B) اگر با این حرکت می‌تونیم حریف رو بزنیم، همونو انتخاب کن
+        foreach (var t in movable)
+            if (LandsOnEnemy(t, diceVal))
+                return t;
+
+        // C) در غیر این صورت، کسی که جلوتره/پیشرفت بیشتری داره
+        if (preferFarthestAdvance)
+            return movable.OrderByDescending(t => t.currentTileIndex + diceVal).First();
+        else
+            return movable[Random.Range(0, movable.Count)];
+    }
+
+    // تخمین سادهٔ فرود آمدن روی دشمن (ایمن‌بودن خانهٔ شروع + نادیده گرفتن مهره‌های فینیش‌شده)
+    private bool LandsOnEnemy(Token me, int steps)
+    {
+        if (me == null || self == null || gameManager == null) return false;
+
+        var rules = gameManager.rules;
+
+        int targetIndex = me.isOnBoard ? me.currentTileIndex + steps : 0; // ورود با ۶ → 0
+        if (targetIndex == 0) return false; // خانه شروع را امن درنظر می‌گیریم
+
+        foreach (var p in gameManager.players)
+        {
+            if (p == null || p == self) continue;
+
+            foreach (var ot in p.Tokens)
+            {
+                if (ot == null || !ot.isOnBoard) continue;
+                if (rules != null && rules.IsTokenFinished(ot)) continue; // حریف‌های فینیش‌شده را نادیده بگیر
+
+                if (ot.currentTileIndex == targetIndex)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
