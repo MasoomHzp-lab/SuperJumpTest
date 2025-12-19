@@ -51,4 +51,33 @@ public class WinManager : MonoBehaviour
             DeclareWinner(color);
         }
     }
+    // -------------------- منطق برد/باخت --------------------
+    private void DeclareWinner(PlayerColor winnerColor)
+    {
+        if (gameEnded) return;
+        gameEnded = true;
+
+        Debug.Log($"[WinManager] Winner = {winnerColor}");
+
+        // اگر لوز فعال نباشد (سین MainLand معمولی): فقط پنل برد مثل قبل
+        if (!useLoseLogic)
+        {
+            ShowResultPanel(winPanel, winText, winnerColor, isWin: true);
+            return;
+        }
+
+        // اگر لوز فعال است (MainLandWithAi)
+        bool humanWon = (winnerColor == humanPlayerColor);
+
+        if (humanWon)
+        {
+            // بازیکن حقیقی برده → پنل برد
+            ShowResultPanel(winPanel, winText, winnerColor, isWin: true);
+        }
+        else
+        {
+            // یکی از بات‌ها برده → پنل باخت
+            ShowResultPanel(losePanel, loseText, winnerColor, isWin: false);
+        }
+    }
 }
