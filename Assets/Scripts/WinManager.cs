@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-
 public class WinManager : MonoBehaviour
 {
     [Header("Win Condition")]
@@ -10,6 +9,9 @@ public class WinManager : MonoBehaviour
     public int tokensToWin = 4;
 
     [Header("Win UI")]
+    public GameObject winPanel;          // پنل برد
+    public TextMeshProUGUI winText;      // متن داخل پنل برد
+
     [Header("Lose UI ( MainLandWithAi)")]
     [Tooltip("اگر این تیک را بزنی، منطق باخت برای بازیکن حقیقی فعال می‌شود.")]
     public bool useLoseLogic = false;
@@ -24,6 +26,7 @@ public class WinManager : MonoBehaviour
         new Dictionary<PlayerColor, int>();
 
     private bool gameEnded = false;
+
     /// وقتی یک مهره وارد خانه‌های آخر خودش شد این متد را صدا بزن
     public void RegisterFinishedToken(Token token)
     {
@@ -51,6 +54,7 @@ public class WinManager : MonoBehaviour
             DeclareWinner(color);
         }
     }
+
     // -------------------- منطق برد/باخت --------------------
     private void DeclareWinner(PlayerColor winnerColor)
     {
@@ -78,6 +82,49 @@ public class WinManager : MonoBehaviour
         {
             // یکی از بات‌ها برده → پنل باخت
             ShowResultPanel(losePanel, loseText, winnerColor, isWin: false);
+        }
+    }
+
+    /// یک متد کمکی برای ست کردن پنل و متن
+    private void ShowResultPanel(GameObject panel, TextMeshProUGUI text, PlayerColor winnerColor, bool isWin)
+    {
+        // فعال کردن پنل
+        if (panel != null)
+        {
+            panel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning($"[WinManager] {(isWin ? "winPanel" : "losePanel")} is NOT assigned!");
+        }
+
+        // تنظیم متن
+        if (text != null)
+        {
+            // متن فعلی داخل TMP، مثلاً:
+            //  برای برد: "{0} برنده شد!"
+            //  برای باخت: "{0} برنده شد، تو باختی!"
+            string template = text.text;
+            string winnerNameFa = GetColorNameFa(winnerColor);
+
+            // {0} رو با اسم رنگ جایگزین می‌کنیم
+            text.text = string.Format(template, winnerNameFa);
+        }
+        else
+        {
+            Debug.LogWarning($"[WinManager] {(isWin ? "winText" : "loseText")} is NOT assigned!");
+        }
+    }
+
+    private string GetColorNameFa(PlayerColor color)
+    {
+        switch (color)
+        {
+            case PlayerColor.Red: return "Red Player ";
+            case PlayerColor.Blue: return "Blue Player ";
+            case PlayerColor.Yellow: return "Yellow Player ";
+            case PlayerColor.Green: return "Green Player ";
+            default: return color.ToString();
         }
     }
 }
