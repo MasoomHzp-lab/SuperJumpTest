@@ -86,3 +86,42 @@ public class AIController : MonoBehaviour
 
         StartCoroutine(AISelectAfterDelay(value));
     }
+ private IEnumerator AISelectAfterDelay(int value)
+    {
+        yield return new WaitForSeconds(selectDelay);
+
+        if (gameManager == null || self == null) { awaitingMyRollResult = false; yield break; }
+
+        var tokens = self.Tokens != null ? new List<Token>(self.Tokens) : null;
+        if (tokens == null || tokens.Count == 0)
+        {
+            awaitingMyRollResult = false;
+            yield break;
+        }
+
+        // از بین حرکت‌های قانونی انتخاب کن
+        Token choice = ChooseToken(tokens, value);
+
+        if (choice != null)
+        {
+            gameManager.OnTokenSelected(choice);
+            // تا پایان حرکت/مدیریت نوبت صبر کن
+            StartCoroutine(ReleaseAwaitingWhenDone());
+        }
+        else
+        {
+            // هیچ حرکت قانونی نداریم → GM خودش پاس می‌ده
+            awaitingMyRollResult = false;
+        }
+    }
+
+    private IEnumerator ReleaseAwaitingWhenDone()
+    {
+        // صبر تا حرکت/نوبت مدیریت شود
+        while (self != null && self.IsMoving())
+            yield return null;
+
+        // یه فریم برای هماهنگی با GM
+        yield return null;
+        awaitingMyRollResult = false;
+    }
