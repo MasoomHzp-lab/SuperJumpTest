@@ -124,4 +124,116 @@ public class AIController : MonoBehaviour
         // یه فریم برای هماهنگی با GM
         yield return null;
         awaitingMyRollResult = false;
+<<<<<<< HEAD
     }
+=======
+    }
+
+    // ===================== انتخاب مهره =====================
+
+    private Token ChooseToken(List<Token> tokens, int diceVal)
+    {
+        // دسترسی به RulesManager برای چک‌کردن مهره‌های فینیش‌شده
+        var rules = (gameManager != null) ? gameManager.rules : null;
+
+        bool IsFinished(Token t) =>
+            (rules != null && t != null) && rules.IsTokenFinished(t);
+
+        bool IsHomeToken(Token t) =>
+            t != null && !t.isOnBoard && !IsFinished(t);
+
+        // لیست حرکت‌های قانونی با استناد به GM (فقط مهره‌های غیر فینیش‌شده)
+        var movable = tokens
+            .Where(t => t != null
+                        && !IsFinished(t)
+                        && gameManager.IsLegalMove(self, t, diceVal))
+            .ToList();
+
+        if (movable.Count == 0) return null;
+
+        bool hasHomeTokens        = tokens.Any(IsHomeToken);
+        bool startOccupiedBySelf  = tokens.Any(t =>
+                                    t != null &&
+                                    !IsFinished(t) &&
+                                    t.isOnBoard &&
+                                    t.currentTileIndex == 0);
+
+        // ۱) اگر ۶ آمده:
+        if (diceVal == 6)
+        {
+            if (startOccupiedBySelf)
+            {
+                // اگر خانه‌ی شروع اشغال است، مهره‌ی روی Start را اول حرکت بده (درب را باز کن)
+                var startTok = movable.FirstOrDefault(t => t.currentTileIndex == 0);
+                if (startTok != null) return startTok;
+
+                // اگر به هر دلیل حرکتش قانونی نبود، بیفت سراغ بهترینِ دیگر
+                return ChooseBest(movable, diceVal);
+            }
+            else
+            {
+                // Start خالی است
+                if (preferEnterOnSix && hasHomeTokens)
+                {
+                    // یکی از مهره‌های خانه را وارد کن (فقط اگر قانونی باشد که هست چون dice=6)
+                    var offBoard = tokens.FirstOrDefault(IsHomeToken);
+                    if (offBoard != null && gameManager.IsLegalMove(self, offBoard, diceVal))
+                        return offBoard;
+                }
+
+                // اگر نخواستیم وارد کنیم، یکی از روی برد را انتخاب کن
+                return ChooseBest(movable, diceVal);
+            }
+        }
+
+        // ۲) غیر از ۶ → فقط از روی برد انتخاب کن
+        return ChooseBest(movable, diceVal);
+    }
+private Token ChooseBest(List<Token> movable, int diceVal)
+    {
+        // اولویت‌ها:
+        // A) اگر مهره‌ای روی Start هست (و قانونی) همونو ببر تا گره‌ی Start باز شه
+        var startTok = movable.FirstOrDefault(t => t.currentTileIndex == 0);
+        if (startTok != null) return startTok;
+
+        // B) اگر با این حرکت می‌تونیم حریف رو بزنیم، همونو انتخاب کن
+        foreach (var t in movable)
+            if (LandsOnEnemy(t, diceVal))
+                return t;
+
+        // C) در غیر این صورت، کسی که جلوتره/پیشرفت بیشتری داره
+        if (preferFarthestAdvance)
+            return movable.OrderByDescending(t => t.currentTileIndex + diceVal).First();
+        else
+            return movable[Random.Range(0, movable.Count)];
+    }
+
+    // تخمین سادهٔ فرود آمدن روی دشمن (ایمن‌بودن خانهٔ شروع + نادیده گرفتن مهره‌های فینیش‌شده)
+    private bool LandsOnEnemy(Token me, int steps)
+    {
+        if (me == null || self == null || gameManager == null) return false;
+
+        var rules = gameManager.rules;
+
+        int targetIndex = me.isOnBoard ? me.currentTileIndex + steps : 0; // ورود با ۶ → 0
+        if (targetIndex == 0) return false; // خانه شروع را امن درنظر می‌گیریم
+
+        foreach (var p in gameManager.players)
+        {
+            if (p == null || p == self) continue;
+
+            foreach (var ot in p.Tokens)
+            {
+                if (ot == null || !ot.isOnBoard) continue;
+                if (rules != null && rules.IsTokenFinished(ot)) continue; // حریف‌های فینیش‌شده را نادیده بگیر
+
+                if (ot.currentTileIndex == targetIndex)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+>>>>>>> Fateme
