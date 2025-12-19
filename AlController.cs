@@ -29,3 +29,53 @@ public class AIController : MonoBehaviour
     {
         if (self == null) self = GetComponent<PlayerController>();
     }
+ private void OnEnable()
+    {
+        if (dice != null) dice.OnDiceRolled += OnDiceRolled;
+    }
+
+    private void OnDisable()
+    {
+        if (dice != null) dice.OnDiceRolled -= OnDiceRolled;
+    }
+
+    private void Update()
+    {
+        if (gameManager == null || self == null) return;
+
+        // فقط نوبت خودِ AI
+        if (gameManager.CurrentPlayer != self) return;
+
+        // اگر مهره‌ای در حال حرکت است، صبر کن
+        if (self.IsMoving()) return;
+
+        // اگر در انتظار نتیجه‌ی رول قبلی هستیم، صبر
+        if (awaitingMyRollResult) return;
+
+        // اگر تاس از دید GM مجاز است، رول کن
+        if (gameManager.CanRoll())
+            StartCoroutine(AIRollAfterDelay());
+    }
+
+    private IEnumerator AIRollAfterDelay()
+    {
+        awaitingMyRollResult = true; // جلوگیری از رول‌های تکراری
+        yield return new WaitForSeconds(rollDelay);
+
+        // دوباره چک کن، شاید وسط تاخیر نوبت عوض شده
+        if (gameManager == null || gameManager.CurrentPlayer != self || !gameManager.CanRoll())
+        {
+            awaitingMyRollResult = false;
+            yield break;
+        }
+
+        if (dice != null)
+        {
+            dice.Roll(); // مطمئن شو متد صحیح همینه (Roll/RollDice)
+        }
+        else
+        {
+            Debug.LogWarning("[AI] Dice reference is missing.");
+            awaitingMyRollResult = false;
+        }
+    }
