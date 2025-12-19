@@ -123,3 +123,39 @@ private IEnumerator MoveCoroutine(int steps)
         Debug.LogWarning("[Token] rulesManager در Token ست نشده!");
     }
 }
+
+    public void EnterAtStart()
+
+{
+    // فرض: اندیس 0 خانه شروع است؛ اگر تابع اختصاصی داری همان را صدا بزن
+    currentTileIndex = 0;
+    Vector3 startPos = boardManager.GetTilePosition(owner.color, currentTileIndex);
+    transform.position = startPos;
+
+    isOnBoard = true;
+    isMoving = false;
+
+    // اگر اسنپ انیمیشن می‌خواهی، می‌توانی یک کوروتینِ کوتاه با لِرپ بگذاری
+    // ولی مهم: steps کم نشود و حرکت جلوتر نرود
+}
+
+ void Awake()
+{
+    audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
+
+    if (rulesManager == null)
+        rulesManager = FindObjectOfType<RulesManager>();   // 👈 این دو خط جدید
+}
+
+
+     public void PlayTokenSound()
+    {
+
+        AudioManager.Instance.PlaySFX(TokenSound);
+
+
+    }
+
+
+
+}
