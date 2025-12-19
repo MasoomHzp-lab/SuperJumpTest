@@ -79,3 +79,10 @@ public class AIController : MonoBehaviour
             awaitingMyRollResult = false;
         }
     }
+ private void OnDiceRolled(int value)
+    {
+        // فقط واکنش در نوبت خودمان
+        if (gameManager == null || gameManager.CurrentPlayer != self) return;
+
+        StartCoroutine(AISelectAfterDelay(value));
+    }
