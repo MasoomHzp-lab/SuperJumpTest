@@ -10,8 +10,15 @@ public class WinManager : MonoBehaviour
     public int tokensToWin = 4;
 
     [Header("Win UI")]
-    public GameObject winPanel;          // پنل برد
-    public TextMeshProUGUI winText;      // متن داخل پنل برد
+    [Header("Lose UI ( MainLandWithAi)")]
+    [Tooltip("اگر این تیک را بزنی، منطق باخت برای بازیکن حقیقی فعال می‌شود.")]
+    public bool useLoseLogic = false;
+
+    [Tooltip("رنگ بازیکن حقیقی در صحنه‌ی MainLandWithAi")]
+    public PlayerColor humanPlayerColor = PlayerColor.Red;
+
+    public GameObject losePanel;         // پنل باخت
+    public TextMeshProUGUI loseText;     // متن داخل پنل باخت
 
     private readonly Dictionary<PlayerColor, int> finishCounters =
         new Dictionary<PlayerColor, int>();
