@@ -14,7 +14,6 @@ public class LudoCaptureByIndex : MonoBehaviour
     public List<int> safeLoopIndices = new List<int>();
     public bool allowStackSameColor = true;       // هم‌رنگ‌ها می‌تونن هم‌خانه شوند
 
-
     [Header("Same-tile precision")]
     public bool enforceCenterSnap = true;         // برای اسنپ دقیق پیشنهاد می‌شود true باشد
     public float ringCenterSnap = 0.08f;          // ~8cm
@@ -34,7 +33,6 @@ private void OnEnable()
             boardManager = FindAnyObjectByType<BoardManager>();
         PrimePlayersAndTokens();
     }
-
     private void Update()
     {
         // کشف خودکار پلیرها اگر لیست خالی است
@@ -86,7 +84,6 @@ private void OnEnable()
             }
         }
     }
-
         private void OnTokenLanded(Token landed)
     {
         if (landed == null || !landed.isOnBoard || boardManager == null) return;
@@ -149,7 +146,6 @@ private void OnEnable()
             }
         }
     }
-
        private bool TryGetRingId(Token t, out int ringId)
     {
         ringId = -1;
@@ -172,7 +168,6 @@ private void OnEnable()
         t.transform.position = center.position;
         if (col) col.enabled = true;
     }
-
     private bool BothNearRingCenter(int ringId, Token a, Token b)
     {
         var list = boardManager?.commonPath;
@@ -195,7 +190,6 @@ private void OnEnable()
         int m = Mod(idx, commonCount);
         return safeLoopIndices != null && safeLoopIndices.Contains(m);
     }
-
     private bool IsStartRing(int ringId, int commonCount)
     {
         if (boardManager == null || commonCount <= 0) return false;
@@ -206,7 +200,6 @@ private void OnEnable()
         int m = Mod(ringId, commonCount);
         return m == r || m == b || m == g || m == y;
     }
-
     private static int Mod(int a, int m)
     {
         if (m <= 0) return a;
@@ -222,21 +215,16 @@ private void OnEnable()
             Debug.LogWarning("[LudoCaptureByIndex] Owner has no spawn points; cannot send home.");
             return;
         }
-
         // اگر انیمیشن/کوروتینی در حال حرکت دارد، اینجا قطعش کن (در صورت وجود API)
         // token.StopAllCoroutines(); // اگر مجاز است
-
         token.isMoving = false;
         token.isOnBoard = false;
         token.currentTileIndex = -1;
-
         // اگر فیلدهای دیگری داری که مربوط به مسیر/هوم‌پث‌اند، اینجا ریست کن:
         // token.enteredHomePath = false;
         // token.pathProgress = 0f;
-
         int slot = FindFirstFreeHomeSlot(owner, token);
         Transform target = owner.spawnPoints[Mathf.Clamp(slot, 0, owner.spawnPoints.Count - 1)];
-
         // detach از هر والد
         token.transform.SetParent(null, true);
         // برای اطمینان از روی هم نیفتادن فیزیکی:
@@ -245,13 +233,10 @@ private void OnEnable()
         token.transform.position = target.position;
         token.transform.rotation = Quaternion.identity;
         if (col) col.enabled = true;
-
         // اگر Token متد ریست خودش را دارد:
         // token.ResetToHome();
-
         Debug.Log($"[SendHome] {token.name} -> {owner.color} spawn slot {slot}");
     }
-
     private int FindFirstFreeHomeSlot(PlayerController owner, Token exceptThis = null)
     {
         int n = owner.spawnPoints.Count;
