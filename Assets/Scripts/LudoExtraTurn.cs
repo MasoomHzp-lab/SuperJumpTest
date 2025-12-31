@@ -13,5 +13,20 @@ public class LudoExtraTurn : MonoBehaviour
     private bool lastRollWasSix = false;
     private readonly Dictionary<PlayerController, bool> movingMap = new Dictionary<PlayerController, bool>();
     private PlayerController snapshotPlayerOnRoll;
+   private void OnEnable()
+    {
+        if (dice != null) dice.OnDiceRolled += OnDiceRolled;
+    }
+
+    private void OnDisable()
+    {
+        if (dice != null) dice.OnDiceRolled -= OnDiceRolled;
+    }
+
+    private void Start()
+    {
+        foreach (var p in players)
+            movingMap[p] = false;
+    }
 
 }
