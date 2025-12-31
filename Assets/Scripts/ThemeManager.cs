@@ -41,5 +41,14 @@ public class ThemeManager : MonoBehaviour
 
         return themes.FirstOrDefault(t => t.themeId == id);
     }
-
+ public ThemeEntry GetActiveTheme()
+    {
+        string id = PlayerPrefs.GetString(ActiveThemeKey, defaultThemeId);
+        var entry = GetThemeById(id);
+        if (entry == null)
+        {
+            entry = GetThemeById(defaultThemeId);
+        }
+        return entry;
+    }
 }
