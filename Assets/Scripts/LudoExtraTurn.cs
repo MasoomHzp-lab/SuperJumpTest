@@ -11,4 +11,8 @@ public class LudoExtraTurn : MonoBehaviour
     [Header("Settings")]
     public bool enabledExtraTurn = true;
 
+ private bool lastRollWasSix = false;
+    private readonly Dictionary<PlayerController, bool> movingMap = new Dictionary<PlayerController, bool>();
+    private PlayerController snapshotPlayerOnRoll;
+
 }
