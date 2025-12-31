@@ -53,41 +53,5 @@ private void OnEnable()
                 }
             }
         }
-<<<<<<< HEAD
-         if (players == null || players.Count == 0) return;
-        if (boardManager == null || boardManager.commonPath == null || boardManager.commonPath.Count == 0) return;
-
-        foreach (var p in players)
-        {
-            if (p == null) continue;
-            var tokens = p.GetTokens();
-            if (tokens == null) continue;
-
-            foreach (var t in tokens)
-            {
-                if (t == null) continue;
-
-                if (!lastMoving.ContainsKey(t)) lastMoving[t] = t.isMoving;
-                if (!lastIndex.ContainsKey(t))  lastIndex[t]  = t.currentTileIndex;
-
-                bool wasMoving = lastMoving[t];
-                int  wasIndex  = lastIndex[t];
-
-                bool nowMoving = t.isMoving;
-                int  nowIndex  = t.currentTileIndex;
-
-                bool landedNow = (wasMoving && !nowMoving) || ((nowIndex != wasIndex) && !nowMoving);
-
-                if (landedNow)
-                    OnTokenLanded(t);
-
-                lastMoving[t] = nowMoving;
-                lastIndex[t]  = nowIndex;
-            }
-        }
-    }
-
-=======
->>>>>>> 5c84ac251dd8e003ed7838155a6e4da2828cbf8a
    
 }
