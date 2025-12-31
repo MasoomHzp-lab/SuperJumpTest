@@ -252,4 +252,41 @@ private void OnEnable()
         Debug.Log($"[SendHome] {token.name} -> {owner.color} spawn slot {slot}");
     }
 
+    private int FindFirstFreeHomeSlot(PlayerController owner, Token exceptThis = null)
+    {
+        int n = owner.spawnPoints.Count;
+        bool[] occ = new bool[n];
+
+        foreach (var t in owner.GetTokens())
+        {
+            if (t == null || t == exceptThis) continue;
+            if (t.isOnBoard) continue;
+
+            int idx = NearestSpawnIndex(owner, t.transform.position);
+            if (idx >= 0 && idx < n) occ[idx] = true;
+        }
+
+        for (int i = 0; i < n; i++)
+            if (!occ[i] && owner.spawnPoints[i] != null) return i;
+
+        // اگر همه پر بود، نزدیک‌ترین رو انتخاب کن تا overlap کمتر باشه
+        int best = NearestSpawnIndex(owner, exceptThis != null ? exceptThis.transform.position : owner.spawnPoints[0].position);
+        return best >= 0 ? best : 0;
+    }
+
+    private int NearestSpawnIndex(PlayerController pc, Vector3 pos)
+    {
+        if (pc == null || pc.spawnPoints == null || pc.spawnPoints.Count == 0) return -1;
+        float best = float.MaxValue;
+        int bestIdx = -1;
+        for (int i = 0; i < pc.spawnPoints.Count; i++)
+        {
+            var sp = pc.spawnPoints[i];
+            if (sp == null) continue;
+            float d = (pos - sp.position).sqrMagnitude;
+            if (d < best) { best = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
+
 }

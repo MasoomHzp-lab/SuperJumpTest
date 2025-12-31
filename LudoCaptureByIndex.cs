@@ -213,5 +213,80 @@ private void OnEnable()
         int r = a % m;
         return r < 0 ? r + m : r;
     }
-     
+         // --- Robust home send (اولین اسلات خالی + ریست state)
+    private void SendHomeRobust(Token token)
+    {
+        var owner = token.owner;
+        if (owner == null || owner.spawnPoints == null || owner.spawnPoints.Count == 0)
+        {
+            Debug.LogWarning("[LudoCaptureByIndex] Owner has no spawn points; cannot send home.");
+            return;
+        }
+
+        // اگر انیمیشن/کوروتینی در حال حرکت دارد، اینجا قطعش کن (در صورت وجود API)
+        // token.StopAllCoroutines(); // اگر مجاز است
+
+        token.isMoving = false;
+        token.isOnBoard = false;
+        token.currentTileIndex = -1;
+
+        // اگر فیلدهای دیگری داری که مربوط به مسیر/هوم‌پث‌اند، اینجا ریست کن:
+        // token.enteredHomePath = false;
+        // token.pathProgress = 0f;
+
+        int slot = FindFirstFreeHomeSlot(owner, token);
+        Transform target = owner.spawnPoints[Mathf.Clamp(slot, 0, owner.spawnPoints.Count - 1)];
+
+        // detach از هر والد
+        token.transform.SetParent(null, true);
+        // برای اطمینان از روی هم نیفتادن فیزیکی:
+        var col = token.GetComponent<Collider>();
+        if (col) col.enabled = false;
+        token.transform.position = target.position;
+        token.transform.rotation = Quaternion.identity;
+        if (col) col.enabled = true;
+
+        // اگر Token متد ریست خودش را دارد:
+        // token.ResetToHome();
+
+        Debug.Log($"[SendHome] {token.name} -> {owner.color} spawn slot {slot}");
+    }
+
+    private int FindFirstFreeHomeSlot(PlayerController owner, Token exceptThis = null)
+    {
+        int n = owner.spawnPoints.Count;
+        bool[] occ = new bool[n];
+
+        foreach (var t in owner.GetTokens())
+        {
+            if (t == null || t == exceptThis) continue;
+            if (t.isOnBoard) continue;
+
+            int idx = NearestSpawnIndex(owner, t.transform.position);
+            if (idx >= 0 && idx < n) occ[idx] = true;
+        }
+
+        for (int i = 0; i < n; i++)
+            if (!occ[i] && owner.spawnPoints[i] != null) return i;
+
+        // اگر همه پر بود، نزدیک‌ترین رو انتخاب کن تا overlap کمتر باشه
+        int best = NearestSpawnIndex(owner, exceptThis != null ? exceptThis.transform.position : owner.spawnPoints[0].position);
+        return best >= 0 ? best : 0;
+    }
+
+    private int NearestSpawnIndex(PlayerController pc, Vector3 pos)
+    {
+        if (pc == null || pc.spawnPoints == null || pc.spawnPoints.Count == 0) return -1;
+        float best = float.MaxValue;
+        int bestIdx = -1;
+        for (int i = 0; i < pc.spawnPoints.Count; i++)
+        {
+            var sp = pc.spawnPoints[i];
+            if (sp == null) continue;
+            float d = (pos - sp.position).sqrMagnitude;
+            if (d < best) { best = d; bestIdx = i; }
+        }
+        return bestIdx;
+    }
+
 }
