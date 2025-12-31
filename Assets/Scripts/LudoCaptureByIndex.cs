@@ -213,5 +213,43 @@ private void OnEnable()
         int r = a % m;
         return r < 0 ? r + m : r;
     }
-     
+         // --- Robust home send (اولین اسلات خالی + ریست state)
+    private void SendHomeRobust(Token token)
+    {
+        var owner = token.owner;
+        if (owner == null || owner.spawnPoints == null || owner.spawnPoints.Count == 0)
+        {
+            Debug.LogWarning("[LudoCaptureByIndex] Owner has no spawn points; cannot send home.");
+            return;
+        }
+
+        // اگر انیمیشن/کوروتینی در حال حرکت دارد، اینجا قطعش کن (در صورت وجود API)
+        // token.StopAllCoroutines(); // اگر مجاز است
+
+        token.isMoving = false;
+        token.isOnBoard = false;
+        token.currentTileIndex = -1;
+
+        // اگر فیلدهای دیگری داری که مربوط به مسیر/هوم‌پث‌اند، اینجا ریست کن:
+        // token.enteredHomePath = false;
+        // token.pathProgress = 0f;
+
+        int slot = FindFirstFreeHomeSlot(owner, token);
+        Transform target = owner.spawnPoints[Mathf.Clamp(slot, 0, owner.spawnPoints.Count - 1)];
+
+        // detach از هر والد
+        token.transform.SetParent(null, true);
+        // برای اطمینان از روی هم نیفتادن فیزیکی:
+        var col = token.GetComponent<Collider>();
+        if (col) col.enabled = false;
+        token.transform.position = target.position;
+        token.transform.rotation = Quaternion.identity;
+        if (col) col.enabled = true;
+
+        // اگر Token متد ریست خودش را دارد:
+        // token.ResetToHome();
+
+        Debug.Log($"[SendHome] {token.name} -> {owner.color} spawn slot {slot}");
+    }
+
 }
