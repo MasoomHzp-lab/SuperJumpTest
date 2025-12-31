@@ -83,5 +83,10 @@ public class ThemeManager : MonoBehaviour
     }
 
     // این متد رو BazaarPaymentManager بعد از خرید موفق صدا می‌زنه
-
+public void UnlockTheme(string themeId)
+    {
+        PlayerPrefs.SetInt("Theme_" + themeId, 1);
+        PlayerPrefs.Save();
+        Debug.Log("[ThemeManager] Theme unlocked: " + themeId);
+    }
 }
