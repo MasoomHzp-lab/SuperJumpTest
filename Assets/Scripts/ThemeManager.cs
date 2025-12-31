@@ -66,5 +66,22 @@ public class ThemeManager : MonoBehaviour
     }
 
     // ---- قفل/باز بودن ----
+   public bool IsThemeFree(string themeId)
+    {
+        return freeThemeIds.Contains(themeId);
+    }
+
+    public bool IsThemeUnlocked(string themeId)
+    {
+        // رایگان‌ها همیشه باز هستند
+        if (IsThemeFree(themeId))
+            return true;
+
+        // پولی‌ها (بعد از خرید توسط BazaarPaymentManager)
+        int val = PlayerPrefs.GetInt("Theme_" + themeId, 0);
+        return val == 1;
+    }
+
+    // این متد رو BazaarPaymentManager بعد از خرید موفق صدا می‌زنه
 
 }
