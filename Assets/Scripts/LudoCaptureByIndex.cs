@@ -150,7 +150,68 @@ private void OnEnable()
         }
     }
 
-=======
->>>>>>> 5c84ac251dd8e003ed7838155a6e4da2828cbf8a
-   
+       private bool TryGetRingId(Token t, out int ringId)
+    {
+        ringId = -1;
+        if (t == null || t.owner == null) return false;
+        var bm = t.owner.boardManager != null ? t.owner.boardManager : boardManager;
+        if (bm == null) return false;
+        return bm.TryGetRingId(t.owner.color, t.currentTileIndex, out ringId);
+    }
+
+    private void SnapToRingCenter(Token t, int ringId)
+    {
+        if (!enforceCenterSnap) return;
+        var list = boardManager?.commonPath;
+        if (list == null || ringId < 0 || ringId >= list.Count) return;
+        var center = list[ringId];
+        if (center == null) return;
+        // اگر فیزیک داری، برخوردها را لحظه‌ای غیرفعال کن تا روی هم بنشینند
+        var col = t.GetComponent<Collider>();
+        if (col) col.enabled = false;
+        t.transform.position = center.position;
+        if (col) col.enabled = true;
+    }
+
+    private bool BothNearRingCenter(int ringId, Token a, Token b)
+    {
+        var list = boardManager?.commonPath;
+        if (list == null || ringId < 0 || ringId >= list.Count) return true;
+        var center = list[ringId];
+        if (center == null) return true;
+
+        float thresholdSq = ringCenterSnap * ringCenterSnap;
+        float da = (a.transform.position - center.position).sqrMagnitude;
+        float db = (b.transform.position - center.position).sqrMagnitude;
+
+        if (da > thresholdSq) { Debug.Log($"[SameTile] A far from center ({Mathf.Sqrt(da):0.000})"); return false; }
+        if (db > thresholdSq) { Debug.Log($"[SameTile] B far from center ({Mathf.Sqrt(db):0.000})"); return false; }
+        return true;
+    }
+
+    private bool IsSafeLoopIndex(int idx, int commonCount)
+    {
+        if (commonCount <= 0) return false;
+        int m = Mod(idx, commonCount);
+        return safeLoopIndices != null && safeLoopIndices.Contains(m);
+    }
+
+    private bool IsStartRing(int ringId, int commonCount)
+    {
+        if (boardManager == null || commonCount <= 0) return false;
+        int r = Mod(boardManager.redStartIndex, commonCount);
+        int b = Mod(boardManager.blueStartIndex, commonCount);
+        int g = Mod(boardManager.greenStartIndex, commonCount);
+        int y = Mod(boardManager.yellowStartIndex, commonCount);
+        int m = Mod(ringId, commonCount);
+        return m == r || m == b || m == g || m == y;
+    }
+
+    private static int Mod(int a, int m)
+    {
+        if (m <= 0) return a;
+        int r = a % m;
+        return r < 0 ? r + m : r;
+    }
+     
 }
