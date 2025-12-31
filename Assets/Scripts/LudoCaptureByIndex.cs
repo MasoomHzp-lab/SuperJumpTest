@@ -87,6 +87,69 @@ private void OnEnable()
         }
     }
 
+        private void OnTokenLanded(Token landed)
+    {
+        if (landed == null || !landed.isOnBoard || boardManager == null) return;
+
+        int commonCount = (boardManager.commonPath != null) ? boardManager.commonPath.Count : 0;
+        if (commonCount <= 0) return;
+
+        bool moverOnHomePath = (landed.currentTileIndex >= commonCount);
+
+        // در مسیر خانۀ پایان معمولا کپچر نداریم
+        if (moverOnHomePath && !allowCaptureOnHomePath) return;
+
+        // RingId مهاجم
+        if (!TryGetRingId(landed, out int moverRing)) return;
+
+        // ــ اسنپ مهاجم به مرکز خانه (برای اینکه دقیقاً "روی هم" دیده شوند)
+        SnapToRingCenter(landed, moverRing);
+
+        foreach (var p in players)
+        {
+            if (p == null) continue;
+            var tokens = p.GetTokens();
+            if (tokens == null) continue;
+
+            foreach (var other in tokens)
+            {
+                if (other == null || other == landed) continue;
+                if (!other.isOnBoard) continue;
+
+                bool otherOnHomePath = (other.currentTileIndex >= commonCount);
+                if ((moverOnHomePath || otherOnHomePath) && !allowCaptureOnHomePath)
+                    continue;
+
+                bool sameOwner = (other.owner != null && landed.owner != null && other.owner == landed.owner);
+                bool sameColor = other.color == landed.color ||
+                                 (other.owner != null && landed.owner != null &&
+                                  other.owner.color == landed.owner.color);
+                if ((sameOwner || sameColor) && allowStackSameColor)
+                    continue;
+
+                if (!TryGetRingId(other, out int otherRing))
+                    continue;
+
+                if (otherRing != moverRing)
+                    continue;
+
+                if (enforceCenterSnap && !BothNearRingCenter(moverRing, landed, other))
+                    continue;
+
+                if (IsSafeLoopIndex(otherRing, commonCount))
+                    continue;
+
+                if (!allowCaptureOnStartTiles && IsStartRing(otherRing, commonCount))
+                    continue;
+
+                // --- کُشتن: قربانی برگردد خانه (اولین اسلات خالی)
+                SendHomeRobust(other);
+
+                Debug.Log($"[Capture] {landed.owner?.playerName} captured {other.owner?.playerName}'s token.");
+            }
+        }
+    }
+
 =======
 >>>>>>> 5c84ac251dd8e003ed7838155a6e4da2828cbf8a
    
