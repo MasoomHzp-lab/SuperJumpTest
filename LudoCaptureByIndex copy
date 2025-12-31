@@ -25,5 +25,5 @@ public class LudoCaptureByIndex : MonoBehaviour
     private readonly Dictionary<Token, bool> lastMoving = new Dictionary<Token, bool>();
     private readonly Dictionary<Token, int>  lastIndex  = new Dictionary<Token, int>();
     private float _findTimer;
-}
+
    
