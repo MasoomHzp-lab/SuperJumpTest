@@ -2,13 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LudoCaptureByIndex : MonoBehaviour
-<<<<<<< HEAD
-{
-       [Header("References")]
-=======
 {  
     [Header("References")]
->>>>>>> origin
     public List<PlayerController> players = new List<PlayerController>();
     public BoardManager boardManager;
 
@@ -17,11 +12,8 @@ public class LudoCaptureByIndex : MonoBehaviour
     public bool allowCaptureOnStartTiles = false; // false یعنی خانه‌های شروع امن‌اند
     [Tooltip("RingId های امن (ستاره‌ها) روی لوپ مشترک.")]
     public List<int> safeLoopIndices = new List<int>();
-<<<<<<< HEAD
-=======
     public bool allowStackSameColor = true;       // هم‌رنگ‌ها می‌تونن هم‌خانه شوند
 
->>>>>>> origin
 
     [Header("Same-tile precision")]
     public bool enforceCenterSnap = true;         // برای اسنپ دقیق پیشنهاد می‌شود true باشد
@@ -31,13 +23,4 @@ public class LudoCaptureByIndex : MonoBehaviour
     public bool autoFindPlayersIfEmpty = true;
     public float autoFindInterval = 1.0f;
 
-<<<<<<< HEAD
-    // snapshots
-    private readonly Dictionary<Token, bool> lastMoving = new Dictionary<Token, bool>();
-    private readonly Dictionary<Token, int>  lastIndex  = new Dictionary<Token, int>();
-    private float _findTimer;
 }
-   
-=======
-}
->>>>>>> origin
