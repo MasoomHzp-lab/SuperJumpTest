@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LudoCaptureByIndex : MonoBehaviour
-{  [Header("References")]
+{  
+    [Header("References")]
     public List<PlayerController> players = new List<PlayerController>();
     public BoardManager boardManager;
 
@@ -12,5 +13,14 @@ public class LudoCaptureByIndex : MonoBehaviour
     [Tooltip("RingId های امن (ستاره‌ها) روی لوپ مشترک.")]
     public List<int> safeLoopIndices = new List<int>();
     public bool allowStackSameColor = true;       // هم‌رنگ‌ها می‌تونن هم‌خانه شوند
+
+
+    [Header("Same-tile precision")]
+    public bool enforceCenterSnap = true;         // برای اسنپ دقیق پیشنهاد می‌شود true باشد
+    public float ringCenterSnap = 0.08f;          // ~8cm
+
+    [Header("Auto-discovery")]
+    public bool autoFindPlayersIfEmpty = true;
+    public float autoFindInterval = 1.0f;
 
 }
