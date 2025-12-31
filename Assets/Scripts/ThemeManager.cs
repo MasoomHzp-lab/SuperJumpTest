@@ -22,4 +22,24 @@ public class ThemeManager : MonoBehaviour
     public List<string> freeThemeIds = new List<string>(); // مثلا ["Classic","Galaxy"]
 
     private const string ActiveThemeKey = "ActiveThemeId";
+    private void Awake()
+    {
+        if (I != null && I != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        I = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    public ThemeEntry GetThemeById(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+            return null;
+
+        return themes.FirstOrDefault(t => t.themeId == id);
+    }
+
 }
