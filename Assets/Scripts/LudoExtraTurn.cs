@@ -29,5 +29,32 @@ public class LudoExtraTurn : MonoBehaviour
         foreach (var p in players)
             movingMap[p] = false;
     }
+ 
+   
+ 
+    private void OnDiceRolled(int value)
+    {
+        lastRollWasSix = (value == 6);
+        snapshotPlayerOnRoll = dice.currentPlayer; // remember who rolled
+        StartCoroutine(WatchForMoveEnd());
+    }
+
+    private IEnumerator WatchForMoveEnd()
+    {
+        // wait while any token of the rolling player is moving
+        if (snapshotPlayerOnRoll == null) yield break;
+
+        while (snapshotPlayerOnRoll.IsMoving())
+            yield return null;
+
+        // extra roll
+        if (enabledExtraTurn && lastRollWasSix)
+        {
+            // ensure dice points to the same player again (so UI/logic align)
+            dice.currentPlayer = snapshotPlayerOnRoll;
+            yield return new WaitForSeconds(0.1f);
+            dice.RollDice();
+        }
+    }
 
 }
