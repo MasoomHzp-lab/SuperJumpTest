@@ -288,5 +288,21 @@ private void OnEnable()
         }
         return bestIdx;
     }
-
+     private void PrimePlayersAndTokens()
+    {
+        if (players == null) players = new List<PlayerController>();
+        foreach (var p in players)
+        {
+            if (p == null) continue;
+            var tokens = p.GetTokens();
+            if (tokens == null) continue;
+            foreach (var t in tokens)
+            {
+                if (t == null) continue;
+                if (!lastMoving.ContainsKey(t)) lastMoving.Add(t, t.isMoving);
+                if (!lastIndex.ContainsKey(t))  lastIndex.Add(t, t.currentTileIndex);
+            }
+        }
+        _findTimer = autoFindInterval;
+    }
 }
