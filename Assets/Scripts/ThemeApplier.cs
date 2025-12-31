@@ -10,5 +10,24 @@ public class ThemeApplier : MonoBehaviour
         if (boardRenderer == null)
             boardRenderer = GetComponent<SpriteRenderer>();
     }
+ private void Start()
+    {
+        if (ThemeManager.I == null)
+        {
+            Debug.LogWarning("[ThemeApplier] ThemeManager not found in scene.");
+            return;
+        }
 
+        var theme = ThemeManager.I.GetActiveTheme();
+        if (theme == null)
+        {
+            Debug.LogWarning("[ThemeApplier] No active theme found.");
+            return;
+        }
+
+        if (boardRenderer != null && theme.boardSprite != null)
+        {
+            boardRenderer.sprite = theme.boardSprite;
+        }
+    }
 }
