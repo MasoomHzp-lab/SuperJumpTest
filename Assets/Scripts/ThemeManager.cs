@@ -51,4 +51,20 @@ public class ThemeManager : MonoBehaviour
         }
         return entry;
     }
+    public void SetActiveTheme(string id)
+    {
+        var entry = GetThemeById(id);
+        if (entry == null)
+        {
+            Debug.LogWarning("[ThemeManager] Theme not found: " + id);
+            return;
+        }
+
+        PlayerPrefs.SetString(ActiveThemeKey, id);
+        PlayerPrefs.Save();
+        Debug.Log("[ThemeManager] Active theme set to: " + id);
+    }
+
+    // ---- قفل/باز بودن ----
+
 }
