@@ -16,4 +16,20 @@ public class ThemeButton : MonoBehaviour
         }
 
         // اگر باز شده → انتخابش کن
+         if (ThemeManager.I.IsThemeUnlocked(themeId))
+        {
+            ThemeManager.I.SetActiveTheme(themeId);
+            Debug.Log("Theme selected: " + themeId);
+            return;
+        }
+
+        // اگر قفله → الان هنوز پرداخت نداریم، فقط پیام بده و هیچ‌کاری نکن
+        Debug.Log("Theme is locked: " + themeId + " (payment not wired yet)");
+        
+        // --- بعدا اینجا خرید بازار رو صدا می‌زنیم ---
+        // if (isPaidTheme && BazaarPaymentManager.Instance != null)
+        // {
+        //     BazaarPaymentManager.Instance.BuyTheme(productId, themeId);
+        // }
+    }
 }
