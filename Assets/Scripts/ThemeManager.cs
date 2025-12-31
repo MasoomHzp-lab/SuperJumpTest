@@ -12,4 +12,14 @@ public class ThemeManager : MonoBehaviour
         public string themeId;     // مثلا: "Classic", "Galaxy", "Forest", ...
         public Sprite boardSprite;
     }
+     [Header("Themes list")]
+    public List<ThemeEntry> themes = new List<ThemeEntry>();
+
+    [Header("Defaults")]
+    public string defaultThemeId = "DarkSky";
+
+    [Header("Free themes (always unlocked)")]
+    public List<string> freeThemeIds = new List<string>(); // مثلا ["Classic","Galaxy"]
+
+    private const string ActiveThemeKey = "ActiveThemeId";
 }
