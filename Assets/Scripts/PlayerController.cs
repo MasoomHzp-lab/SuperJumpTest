@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     public BoardManager boardManager;
-    public GameManager gameManager;           // حتما در Inspector ست شود
-    public GameObject tokenPrefab;
+    public GameManager gameManager;           
+        public GameObject tokenPrefab;
 
     [Header("Spawn Points (exactly 4)")]
     public List<Transform> spawnPoints = new List<Transform>();
@@ -71,7 +71,6 @@ public class PlayerController : MonoBehaviour
         if (token == null || token.isMoving) return false;
         if (!tokens.Contains(token)) return false; // فقط مهره‌های خودش
         token.MoveSteps(steps);
-        // PlayTokenSound();
         return true;
 
     }
