@@ -9,8 +9,8 @@ public class Dice : MonoBehaviour
     public AudioClip diceRollingSound;
 
     [Header("Dice Settings")]
-    public Sprite[] diceSides;         // 6 تصویر
-    public int[] diceValues = new int[6]; // 6 مقدار متناظر
+    public Sprite[] diceSides;         
+        public int[] diceValues = new int[6]; 
     public Image diceImage;
 
     [Header("Roll FX")]
@@ -64,10 +64,8 @@ public class Dice : MonoBehaviour
 
         if (CheatManager.Instance != null && CheatManager.Instance.TryConsumeForcedRoll(out forced))
         {
-            // مقدار تاس را زورکی از چیت می‌گیریم
             steps = Mathf.Clamp(forced, 1, 6);
 
-            // پیدا کردن شاخص اسپرایت متناظر با مقدار steps
             int cheatIdx = -1;
             if (diceValues != null && diceValues.Length == diceSides.Length)
             {
@@ -82,7 +80,6 @@ public class Dice : MonoBehaviour
         }
         else
         {
-            // حالت عادی (تصادفی)
             idx = UnityEngine.Random.Range(0, diceSides.Length);
             if (diceImage) diceImage.sprite = diceSides[idx];
 
