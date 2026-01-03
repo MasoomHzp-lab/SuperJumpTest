@@ -124,9 +124,6 @@ public class AIController : MonoBehaviour
         // یه فریم برای هماهنگی با GM
         yield return null;
         awaitingMyRollResult = false;
-<<<<<<< HEAD
-    }
-=======
     }
 
     // ===================== انتخاب مهره =====================
@@ -236,4 +233,3 @@ private Token ChooseBest(List<Token> movable, int diceVal)
         return false;
     }
 }
->>>>>>> Fateme
